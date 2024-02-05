@@ -1,0 +1,4 @@
+SBIC_PATH = "data/SBIC/"
+SBIC_TEST_PATH = f"{SBIC_PATH}SBIC.v2.tst.csv"
+SBIC_TRAIN_PATH = f"{SBIC_PATH}SBIC.v2.trn.csv"
+SBIC_DEV_PATH = f"{SBIC_PATH}SBIC.v2.dev.csv"
