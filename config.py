@@ -9,6 +9,9 @@ LOG_DIR = "logs/"
 GPT2_SMALL = "/bigwork/nhwpknet/models/gpt2-small"
 GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
 
+# model settings
+MAX_LENGTH = 1024
+
 # logging configuration
 IC_ENABLE = True
 LOGGING_LEVEL = "INFO"

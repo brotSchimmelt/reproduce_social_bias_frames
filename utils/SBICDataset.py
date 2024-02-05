@@ -43,7 +43,9 @@ class SBICDataset(Dataset):
             self.data.append(sample)
 
         # tokenize the sample
-        self.encoded_data = tokenizer(self.data, truncation=True, padding=True)
+        self.encoded_data = tokenizer(
+            self.data, truncation=True, padding=True, max_length=config.MAX_LENGTH
+        )
         self.input_ids = self.encoded_data["input_ids"]
         self.attention_mask = self.encoded_data["attention_mask"]
 
