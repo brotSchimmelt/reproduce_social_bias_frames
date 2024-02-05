@@ -82,7 +82,7 @@ def train(
     # move model to GPU
     device = get_device()
     model.to(device)
-    ic(device)
+    logging.info(f"Device: {device}")
 
     model.train()
 
@@ -92,28 +92,37 @@ def train(
         optim, config.WARMUP_STEPS, len(train_data) * epochs
     )
 
-    for epoch in range(epochs):
-        total_loss = 0
-        progress_bar = tqdm(enumerate(train_data), total=len(train_data))
-        for step, batch in progress_bar:
-            inputs = batch[0].to(device)
-            attention_mask = batch[1].to(device)
+    # for epoch in range(epochs):
+    #     total_loss = 0
+    #     progress_bar = tqdm(enumerate(train_data), total=len(train_data))
+    #     for _, batch in progress_bar:
+    #         inputs = batch[0].to(device)
+    #         attention_mask = batch[1].to(device)
 
-            model.zero_grad()
-            outputs = model(input_ids=inputs, attention_mask=attention_mask)
-            loss = outputs.loss
+    #         model.zero_grad()
+    #         outputs = model(input_ids=inputs, attention_mask=attention_mask)
+    #         loss = outputs.loss
+    #         loss.backward()
+    #         optim.step()
+    #         scheduler.step()
+
+    #         total_loss += loss.item()
+    #         progress_bar.set_description(f"Epoch {epoch + 1} Loss {loss.item()}")
+
+    #     avg_train_loss = total_loss / len(train_data)
+    #     ic(f"Avg train loss in epoch {epoch + 1}: {avg_train_loss}")
+
+    #     # validation step
+    #     validate(dev_data, model, device)
+    for i in tqdm.tqdm(range(epochs)):
+        for X, a in train_data:
+            X = X.to(device)
+            a = a.to(device)
+            optim.zero_grad()
+            loss = model(X, attention_mask=a, labels=X).loss
             loss.backward()
             optim.step()
             scheduler.step()
-
-            total_loss += loss.item()
-            progress_bar.set_description(f"Epoch {epoch + 1} Loss {loss.item()}")
-
-        avg_train_loss = total_loss / len(train_data)
-        ic(f"Avg train loss in epoch {epoch + 1}: {avg_train_loss}")
-
-        # validation step
-        validate(dev_data, model, device)
 
 
 def main() -> None:
