@@ -162,3 +162,4 @@ cython_debug/
 .DS_Store
 tmp/*
 .vscode/*
+_*.py
