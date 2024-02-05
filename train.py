@@ -43,7 +43,7 @@ def main() -> None:
 
     # load model
     model = GPT2LMHeadModel.from_pretrained(model_path)
-    model.resize_token_embeddings(len(tokenizer))  # resize the token embeddings
+    model.resize_token_embeddings(len(tokenizer))  # since we added new tokens
 
     # load datasets
     train_dataset = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
