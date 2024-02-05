@@ -79,15 +79,16 @@ def train(
     # move model to GPU
     device = get_device()
     model.to(device)
+    ic(device)
 
     model.train()
 
     # the paper mentions linear warmup
     optim = Adam(model.parameters(), lr=config.LEARNING_RATE)
     scheduler = get_linear_schedule_with_warmup(
-        optim, config.WARMUP_STEPS, len(train_data) * config.EPOCHS
+        optim, config.WARMUP_STEPS, len(train_data) * epochs
     )
-    ic(len(train_data), len(config.EPOCHS))  # TODO: remove
+    ic(len(train_data), epochs)  # TODO: remove
 
     for epoch in range(epochs):
         total_loss = 0
@@ -114,18 +115,21 @@ def train(
 def main() -> None:
 
     # load model and tokenizer
+    print("Loading model and tokenizer...")
     model_path = config.GPT2_SMALL
     tokenizer = load_tokenizer(model_path)
     model = GPT2LMHeadModel.from_pretrained(model_path)
     model.resize_token_embeddings(len(tokenizer))  # since we added new tokens
 
     # load datasets
+    print("Loading datasets...")
     train_data = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
     dev_data = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
     train_dataset = DataLoader(train_data, batch_size=config.BATCH_SIZE, shuffle=True)
     dev_dataset = DataLoader(dev_data, batch_size=config.BATCH_SIZE, shuffle=False)
     ic(len(train_data), len(dev_data))
 
+    print("Training model...")
     train(train_dataset, dev_dataset, model)
 
 
