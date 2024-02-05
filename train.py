@@ -6,6 +6,7 @@ from icecream import ic
 from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
 import config
+from utils.helper import get_run_time
 from utils.SBICDataset import SBICDataset
 
 #### LOGGING ####
@@ -24,6 +25,19 @@ logging.basicConfig(
 #### LOGGING ####
 
 
-# load model and tokenizer
-model = ...
-tokenizer = ...
+def main() -> None:
+
+    # load model and tokenizer
+    model_path = config.GPT2_SMALL
+    model = GPT2LMHeadModel.from_pretrained(model_path)
+    tokenizer = GPT2Tokenizer.from_pretrained(model_path)
+
+    # load datasets
+    train_dataset = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
+    dev_dataset = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
+    ic(len(train_dataset), len(dev_dataset))
+
+
+if __name__ == "__main__":
+    main()
+    print(f"Elapsed time: {get_run_time(start)} min.")
