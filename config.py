@@ -5,6 +5,10 @@ SBIC_TRAIN_PATH = f"{SBIC_PATH}SBIC.v2.trn.csv"
 SBIC_DEV_PATH = f"{SBIC_PATH}SBIC.v2.dev.csv"
 LOG_DIR = "logs/"
 
+# model paths
+GPT2_SMALL = "/bigwork/nhwpknet/models/gpt2-small"
+GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
+
 # logging configuration
 IC_ENABLE = True
 LOGGING_LEVEL = "INFO"
