@@ -29,8 +29,21 @@ def main() -> None:
 
     # load model and tokenizer
     model_path = config.GPT2_SMALL
-    model = GPT2LMHeadModel.from_pretrained(model_path)
     tokenizer = GPT2Tokenizer.from_pretrained(model_path)
+    # add new and special tokens
+    tokenizer.add_special_tokens(
+        {
+            "pad_token": "[PAD]",
+            "bos_token": config.START_TOKEN,
+            "eos_token": config.END_TOKEN,
+            "additional_special_tokens": config.SEP_TOKEN,
+        }
+    )
+    tokenizer.add_tokens(config.OTHER_TOKENS)
+
+    # load model
+    model = GPT2LMHeadModel.from_pretrained(model_path)
+    model.resize_token_embeddings(len(tokenizer))  # resize the token embeddings
 
     # load datasets
     train_dataset = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)

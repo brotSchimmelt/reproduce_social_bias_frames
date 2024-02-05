@@ -20,6 +20,18 @@ LOGGING_FILE_DATEFMT = "%d_%m-%H_%M_%S"
 START_TOKEN = "[STR]"
 END_TOKEN = "[END]"
 SEP_TOKEN = "[SEP]"
+OTHER_TOKENS = [
+    "[offN]",
+    "[offY]",
+    "[lewdN]",
+    "[lewdY]",
+    "[intN]",
+    "[intY]",
+    "[grpN]",
+    "[grpY]",
+    "[ingN]",
+    "[ingY]",
+]
 OFF_TOKEN = {0: "[offN]", 1: "[offY]"}
 LEWD_TOKEN = {
     0: "[lewdN]",
