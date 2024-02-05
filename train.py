@@ -36,7 +36,7 @@ def main() -> None:
             "pad_token": "[PAD]",
             "bos_token": config.START_TOKEN,
             "eos_token": config.END_TOKEN,
-            "additional_special_tokens": config.SEP_TOKEN,
+            "additional_special_tokens": [config.SEP_TOKEN],
         }
     )
     tokenizer.add_tokens(config.OTHER_TOKENS)
