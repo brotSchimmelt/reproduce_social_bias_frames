@@ -88,15 +88,16 @@ def train(
     scheduler = get_linear_schedule_with_warmup(
         optim, config.WARMUP_STEPS, len(train_data) * epochs
     )
-    ic(len(train_data), epochs)  # TODO: remove
 
     for epoch in range(epochs):
         total_loss = 0
         progress_bar = tqdm(enumerate(train_data), total=len(train_data))
-        for _, batch in progress_bar:
-            inputs, labels = batch["input_ids"].to(device), batch["labels"].to(device)
+        for step, batch in progress_bar:
+            inputs = batch[0].to(device)
+            attention_mask = batch[1].to(device)
+
             model.zero_grad()
-            outputs = model(inputs, labels=labels)
+            outputs = model(input_ids=inputs, attention_mask=attention_mask)
             loss = outputs.loss
             loss.backward()
             optim.step()
@@ -109,7 +110,7 @@ def train(
         ic(f"Avg train loss in epoch {epoch + 1}: {avg_train_loss}")
 
         # validation step
-        validate(dev_data, model, device)
+        # validate(dev_data, model, device)
 
 
 def main() -> None:
@@ -127,7 +128,6 @@ def main() -> None:
     dev_data = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
     train_dataset = DataLoader(train_data, batch_size=config.BATCH_SIZE, shuffle=True)
     dev_dataset = DataLoader(dev_data, batch_size=config.BATCH_SIZE, shuffle=False)
-    ic(len(train_data), len(dev_data))
 
     print("Training model...")
     train(train_dataset, dev_dataset, model)
