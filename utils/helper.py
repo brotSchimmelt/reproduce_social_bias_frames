@@ -3,7 +3,22 @@ import logging
 import re
 from datetime import datetime
 
+import torch
 from icecream import ic
+
+
+def get_device() -> str:
+    """
+    Determines the most suitable device for PyTorch operations.
+
+    Returns:
+    - str: The identifier of the most suitable device ("cuda", "mps", or "cpu").
+    """
+    return (
+        "cuda"
+        if torch.cuda.is_available()
+        else "mps" if torch.backends.mps.is_available() else "cpu"
+    )
 
 
 def get_run_time(start_time: datetime) -> str:
