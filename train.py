@@ -55,8 +55,11 @@ def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> None:
 
     with torch.no_grad():
         for batch in dev_data:
-            inputs, labels = batch["input_ids"].to(device), batch["labels"].to(device)
-            outputs = model(inputs, labels=labels)
+
+            inputs = batch[0].to(device)
+            attention_mask = batch[1].to(device)
+
+            outputs = model(input_ids=inputs, attention_mask=attention_mask)
             loss = outputs.loss
 
             total_loss += loss.item()
@@ -110,7 +113,7 @@ def train(
         ic(f"Avg train loss in epoch {epoch + 1}: {avg_train_loss}")
 
         # validation step
-        # validate(dev_data, model, device)
+        validate(dev_data, model, device)
 
 
 def main() -> None:
