@@ -2,11 +2,16 @@ import logging
 import os
 from datetime import datetime
 
+import torch
+import torch.nn.functional as F
 from icecream import ic
-from transformers import GPT2LMHeadModel, GPT2Tokenizer
+from torch.optim import Adam
+from torch.utils.data import DataLoader
+from tqdm import tqdm
+from transformers import GPT2LMHeadModel, GPT2Tokenizer, get_linear_schedule_with_warmup
 
 import config
-from utils.helper import get_run_time
+from utils.helper import get_device, get_run_time
 from utils.SBICDataset import SBICDataset
 
 #### LOGGING ####
@@ -25,11 +30,10 @@ logging.basicConfig(
 #### LOGGING ####
 
 
-def main() -> None:
-
-    # load model and tokenizer
-    model_path = config.GPT2_SMALL
+def load_tokenizer(model_path: str) -> GPT2Tokenizer:
+    """Load tokenizer and add special tokens."""
     tokenizer = GPT2Tokenizer.from_pretrained(model_path)
+
     # add new and special tokens
     tokenizer.add_special_tokens(
         {
@@ -41,14 +45,88 @@ def main() -> None:
     )
     tokenizer.add_tokens(config.OTHER_TOKENS)
 
-    # load model
+    return tokenizer
+
+
+def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> None:
+    """Validate the performance on the dev dataset."""
+    model.eval()
+    total_loss = 0
+
+    with torch.no_grad():
+        for batch in dev_data:
+            inputs, labels = batch["input_ids"].to(device), batch["labels"].to(device)
+            outputs = model(inputs, labels=labels)
+            loss = outputs.loss
+
+            total_loss += loss.item()
+
+    avg_val_loss = total_loss / len(dev_data)
+    ic(f"Validation Loss: {avg_val_loss}")
+
+    # set model back to train mode, just in case
+    model.train()
+
+
+def train(
+    train_data: DataLoader,
+    dev_data: DataLoader,
+    model: GPT2LMHeadModel,
+    epochs: int = config.EPOCHS,
+) -> None:
+    """Train the model and validate on dev set."""
+
+    # move model to GPU
+    device = get_device()
+    model.to(device)
+
+    model.train()
+
+    # the paper mentions linear warmup
+    optim = Adam(model.parameters(), lr=config.LEARNING_RATE)
+    scheduler = get_linear_schedule_with_warmup(
+        optim, config.WARMUP_STEPS, len(train_data) * config.EPOCHS
+    )
+    ic(len(train_data), len(config.EPOCHS))  # TODO: remove
+
+    for epoch in range(epochs):
+        total_loss = 0
+        progress_bar = tqdm(enumerate(train_data), total=len(train_data))
+        for _, batch in progress_bar:
+            inputs, labels = batch["input_ids"].to(device), batch["labels"].to(device)
+            model.zero_grad()
+            outputs = model(inputs, labels=labels)
+            loss = outputs.loss
+            loss.backward()
+            optim.step()
+            scheduler.step()
+
+            total_loss += loss.item()
+            progress_bar.set_description(f"Epoch {epoch + 1} Loss {loss.item()}")
+
+        avg_train_loss = total_loss / len(train_data)
+        ic(f"Avg train loss in epoch {epoch + 1}: {avg_train_loss}")
+
+        # validation step
+        validate(dev_data, model, device)
+
+
+def main() -> None:
+
+    # load model and tokenizer
+    model_path = config.GPT2_SMALL
+    tokenizer = load_tokenizer(model_path)
     model = GPT2LMHeadModel.from_pretrained(model_path)
     model.resize_token_embeddings(len(tokenizer))  # since we added new tokens
 
     # load datasets
-    train_dataset = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
-    dev_dataset = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
-    ic(len(train_dataset), len(dev_dataset))
+    train_data = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
+    dev_data = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
+    train_dataset = DataLoader(train_data, batch_size=config.BATCH_SIZE, shuffle=True)
+    dev_dataset = DataLoader(dev_data, batch_size=config.BATCH_SIZE, shuffle=False)
+    ic(len(train_data), len(dev_data))
+
+    train(train_dataset, dev_dataset, model)
 
 
 if __name__ == "__main__":
