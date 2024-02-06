@@ -15,7 +15,8 @@ class SBICDataset(Dataset):
         self.tokenizer = tokenizer
         self.path = path
         self.df = pd.read_csv(self.path)
-        self.data = []
+        self.generation_prompts = []
+        self.targets = []
 
         # iterate over the dataframe and prepare the data
         for _, row in self.df.iterrows():
@@ -30,8 +31,8 @@ class SBICDataset(Dataset):
             group = row["targetMinority"]
             statement = row["targetStereotype"]
 
-            # create sample
-            sample = config.SAMPLE_TEMPLATE.format(
+            # create samples
+            target = config.FULL_SAMPLE_TEMPLATE.format(
                 post=post,
                 lewd=config.LEWD_TOKEN[lewd],
                 off=config.OFF_TOKEN[off],
@@ -41,29 +42,36 @@ class SBICDataset(Dataset):
                 statement=statement,
                 ing=config.ING_TOKEN[ing],
             ).strip()
+            generation_prompt = config.GENERATION_TEMPLATE.format(post=post).strip()
 
-            self.data.append(sample)
+            self.generation_prompts.append(generation_prompt)
+            self.targets.append(target)
 
-        # tokenize the sample
-        self.encoded_data = tokenizer(
-            self.data,
+        # tokenize the data
+        self.encoded_prompts = tokenizer(
+            self.generation_prompts,
             truncation=True,
             padding=True,
             max_length=config.MAX_LENGTH,
             return_tensors="pt",
         )
-        self.input_ids = self.encoded_data["input_ids"]
-        self.attention_mask = self.encoded_data["attention_mask"]
-
-        logging.info(f"First input_ids: {self.input_ids[0]}")
+        self.encoded_targets = tokenizer(
+            self.targets,
+            truncation=True,
+            padding=True,
+            max_length=config.MAX_LENGTH,
+            return_tensors="pt",
+        )
+        self.input_ids = self.encoded_prompts["input_ids"]
+        self.attention_mask = self.encoded_prompts["attention_mask"]
+        self.labels = self.encoded_targets["input_ids"]
 
     def __len__(self) -> int:
-        return len(self.data)
+        return len(self.labels)
 
-
-def __getitem__(self, idx):
-    return {
-        "input_ids": self.input_ids[idx],
-        "attention_mask": self.attention_mask[idx],
-        "labels": self.input_ids[idx],
-    }
+    def __getitem__(self, idx):
+        return {
+            "input_ids": self.input_ids[idx],
+            "attention_mask": self.attention_mask[idx],
+            "labels": self.labels[idx],
+        }
