@@ -46,7 +46,7 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
 def main():
 
     # load model and tokenizer
-    model_path = config.GPT2_SMALL
+    model_path = config.GPT2_XL
     tokenizer = load_tokenizer(model_path)
     model = GPT2LMHeadModel.from_pretrained(model_path)
     model.resize_token_embeddings(len(tokenizer))
@@ -60,7 +60,7 @@ def main():
     # weight decay is also not in the paper
     training_args = TrainingArguments(
         output_dir="./tmp/results",
-        num_train_epochs=3,  # config.EPOCHS
+        num_train_epochs=config.EPOCHS,  # 1,2,5
         per_device_train_batch_size=config.BATCH_SIZE,
         per_device_eval_batch_size=config.BATCH_SIZE,
         warmup_steps=config.WARMUP_STEPS,  # number of warmup steps is not mentioned in the paper
@@ -86,7 +86,7 @@ def main():
     print(f"Test Loss: {test_results['eval_loss']}")
 
     # save the model
-    model_path = f"./best_model_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    model_path = f"./best_model_{timestamp}"
     model.save_pretrained(model_path)
     tokenizer.save_pretrained(model_path)
 
