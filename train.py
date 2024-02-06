@@ -12,7 +12,7 @@ from tqdm import tqdm
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, get_linear_schedule_with_warmup
 
 import config
-from utils.helper import get_device, get_run_time
+from utils.helper import get_device, get_run_time, set_seed
 from utils.SBICDataset import SBICDataset
 
 #### LOGGING ####
@@ -113,7 +113,8 @@ def train(
             )  # labels are same as input_ids for language modeling
 
             optim.zero_grad()
-            loss = model(input_ids, attention_mask=attention_mask, labels=labels).loss
+            output = model(input_ids, attention_mask=attention_mask, labels=labels)
+            loss = output.loss
             loss.backward()
 
             optim.step()
@@ -174,9 +175,10 @@ def main() -> None:
 
     # check performance on the test set
     loss = validate(test_dataset, trained_model, get_device())
-    print(f"Loss on test set: {loss}")
+    logging.info(f"Loss on test set: {loss}")
 
 
 if __name__ == "__main__":
+    set_seed(config.SEED)
     main()
     print(f"Elapsed time: {get_run_time(start)} min.")

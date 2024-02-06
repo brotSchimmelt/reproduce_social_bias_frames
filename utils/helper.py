@@ -1,10 +1,28 @@
 import html
 import logging
+import random
 import re
 from datetime import datetime
 
+import numpy as np
 import torch
 from icecream import ic
+
+
+def set_seed(seed_value: int = 42) -> None:
+    """
+    Sets the seed for random number generators in random, numpy, and torch for reproducibility.
+
+    Parameters:
+    - seed_value (int, optional): The seed value to use for all random number generators. Defaults to 42.
+    """
+    random.seed(seed_value)
+    np.random.seed(seed_value)
+    torch.manual_seed(seed_value)
+    torch.cuda.manual_seed(seed_value)
+    torch.cuda.manual_seed_all(seed_value)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 
 def get_device() -> str:

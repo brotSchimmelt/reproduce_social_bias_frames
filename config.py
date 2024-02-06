@@ -9,12 +9,15 @@ LOG_DIR = "logs/"
 GPT2_SMALL = "/bigwork/nhwpknet/models/gpt2-small"
 GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
 
+# random seed
+SEED = 42
+
 # model settings
 MAX_LENGTH = 1024
 WARMUP_STEPS = 500
 BATCH_SIZE = 4  # from paper
 LEARNING_RATE = 1e-5  # from paper
-EPOCHS = 1  # 1,2,5 from paper
+EPOCHS = 5  # 1,2,5 from paper
 
 # logging configuration
 IC_ENABLE = True
