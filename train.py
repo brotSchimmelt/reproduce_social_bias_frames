@@ -50,25 +50,27 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
 
 def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> None:
     """Validate the performance on the dev dataset."""
-    model.eval()
-    total_loss = 0
+    pass
+    # TODO: add validation loop
+    # model.eval()
 
-    with torch.no_grad():
-        for batch in dev_data:
+    # total_loss = 0
+    # with torch.no_grad():
+    #     for batch in dev_data:
 
-            inputs = batch[0].to(device)
-            attention_mask = batch[1].to(device)
+    #         inputs = batch[0].to(device)
+    #         attention_mask = batch[1].to(device)
 
-            outputs = model(input_ids=inputs, attention_mask=attention_mask)
-            loss = outputs.loss
+    #         outputs = model(input_ids=inputs, attention_mask=attention_mask)
+    #         loss = outputs.loss
 
-            total_loss += loss.item()
+    #         total_loss += loss.item()
 
-    avg_val_loss = total_loss / len(dev_data)
-    ic(f"Validation Loss: {avg_val_loss}")
+    # avg_val_loss = total_loss / len(dev_data)
+    # ic(f"Validation Loss: {avg_val_loss}")
 
     # set model back to train mode, just in case
-    model.train()
+    # model.train()
 
 
 def train(
@@ -92,30 +94,10 @@ def train(
         optim, config.WARMUP_STEPS, len(train_data) * epochs
     )
 
-    # for epoch in range(epochs):
-    #     total_loss = 0
-    #     progress_bar = tqdm(enumerate(train_data), total=len(train_data))
-    #     for _, batch in progress_bar:
-    #         inputs = batch[0].to(device)
-    #         attention_mask = batch[1].to(device)
-
-    #         model.zero_grad()
-    #         outputs = model(input_ids=inputs, attention_mask=attention_mask)
-    #         loss = outputs.loss
-    #         loss.backward()
-    #         optim.step()
-    #         scheduler.step()
-
-    #         total_loss += loss.item()
-    #         progress_bar.set_description(f"Epoch {epoch + 1} Loss {loss.item()}")
-
-    #     avg_train_loss = total_loss / len(train_data)
-    #     ic(f"Avg train loss in epoch {epoch + 1}: {avg_train_loss}")
-
-    #     # validation step
-    #     validate(dev_data, model, device)
-    for _ in tqdm(range(epochs)):
-        for X, a in train_data:
+    # train loop
+    for idx in range(epochs):
+        print(f"Epoch {idx+1}")
+        for X, a in tqdm(train_data):
             X = X.to(device)
             a = a.to(device)
             optim.zero_grad()
@@ -123,6 +105,9 @@ def train(
             loss.backward()
             optim.step()
             scheduler.step()
+
+    # TODO: figure out how to validate the model
+    # validate(dev_data, model, device)
 
 
 def main() -> None:
