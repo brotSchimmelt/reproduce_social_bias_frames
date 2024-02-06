@@ -51,16 +51,23 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
 
 def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> float:
     """Validate the performance on the dev dataset."""
+
     model.eval()
+
     total_loss = 0
     with torch.no_grad():
-        for X, a in tqdm(dev_data):
-            X = X.to(device)
-            a = a.to(device)
-            outputs = model(X, attention_mask=a, labels=X)
+        for batch in tqdm(dev_data):
+
+            # unpack batch
+            input_ids = batch["input_ids"].to(device)
+            attention_mask = batch["attention_mask"].to(device)
+            labels = batch["input_ids"].to(device)
+
+            outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
             loss = outputs.loss
             total_loss += loss.item()
 
+    # compute average validation loss
     avg_val_loss = total_loss / len(dev_data)
     logging.info(f"Validation Loss: {avg_val_loss}")
     print(f"Validation Loss: {avg_val_loss}")
@@ -96,16 +103,25 @@ def train(
     for idx in range(epochs):
         print(f"Start Epoch {idx+1}:")
         total_loss = 0
-        for X, a in tqdm(train_data):
-            X = X.to(device)
-            a = a.to(device)
+        for batch in tqdm(train_data):
+
+            # unpack batch
+            input_ids = batch["input_ids"].to(device)
+            attention_mask = batch["attention_mask"].to(device)
+            labels = batch["input_ids"].to(
+                device
+            )  # labels are same as input_ids for language modeling
+
             optim.zero_grad()
-            loss = model(X, attention_mask=a, labels=X).loss
+            loss = model(input_ids, attention_mask=attention_mask, labels=labels).loss
             loss.backward()
+
             optim.step()
             scheduler.step()
+
             total_loss += loss.item()
 
+        # compute average training loss for one epoch
         avg_train_loss = total_loss / len(train_data)
         logging.info(f"Epoch {idx+1} - Training Loss: {avg_train_loss}")
         print(f"Epoch {idx+1} - Training Loss: {avg_train_loss}")

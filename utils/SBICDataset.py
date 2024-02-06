@@ -60,5 +60,10 @@ class SBICDataset(Dataset):
     def __len__(self) -> int:
         return len(self.data)
 
-    def __getitem__(self, idx):
-        return (self.input_ids[idx], self.attention_mask[idx])
+
+def __getitem__(self, idx):
+    return {
+        "input_ids": self.input_ids[idx],
+        "attention_mask": self.attention_mask[idx],
+        "labels": self.input_ids[idx],
+    }
