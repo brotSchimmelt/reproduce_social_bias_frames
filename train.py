@@ -1,5 +1,6 @@
 import logging
 import os
+import shutil
 from datetime import datetime
 
 import torch
@@ -48,7 +49,7 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
     return tokenizer
 
 
-def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> None:
+def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> float:
     """Validate the performance on the dev dataset."""
     model.eval()
     total_loss = 0
@@ -63,7 +64,10 @@ def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> None:
     avg_val_loss = total_loss / len(dev_data)
     logging.info(f"Validation Loss: {avg_val_loss}")
     print(f"Validation Loss: {avg_val_loss}")
-    model.train()
+
+    model.train()  # don't forget this all the time
+
+    return avg_val_loss
 
 
 def train(
@@ -71,7 +75,7 @@ def train(
     dev_data: DataLoader,
     model: GPT2LMHeadModel,
     epochs: int = config.EPOCHS,
-) -> None:
+) -> GPT2LMHeadModel:
     """Train the model and validate on dev set."""
 
     # move model to GPU
@@ -86,10 +90,11 @@ def train(
     scheduler = get_linear_schedule_with_warmup(
         optim, config.WARMUP_STEPS, len(train_data) * epochs
     )
+    val_loss_history, model_checkpoint_paths = [], []
 
     # train loop
     for idx in range(epochs):
-        print(f"Epoch {idx+1}")
+        print(f"Start Epoch {idx+1}:")
         total_loss = 0
         for X, a in tqdm(train_data):
             X = X.to(device)
@@ -105,7 +110,29 @@ def train(
         logging.info(f"Epoch {idx+1} - Training Loss: {avg_train_loss}")
         print(f"Epoch {idx+1} - Training Loss: {avg_train_loss}")
 
-    validate(dev_data, model, device)
+        val_loss = validate(dev_data, model, device)
+
+        # save current model version and val loss
+        val_loss_history.append(val_loss)
+        epoch_model_path = f"tmp/early_stopping/intermediate_model_epoch_{idx+1}.pt"
+        torch.save(model.state_dict(), epoch_model_path)
+        model_checkpoint_paths.append(epoch_model_path)
+
+    # save only the best model
+    best_epoch = val_loss_history.index(min(val_loss_history)) + 1
+    best_model_path = model_checkpoint_paths[best_epoch - 1]
+    best_model_final_path = f"tmp/models/best_model_{epochs}_{timestamp}.pt"
+    shutil.copy(best_model_path, best_model_final_path)
+    logging.info(f"Best model saved at: {best_model_final_path}")
+    logging.info(f"Best model epoch: {best_epoch}")
+    logging.info(f"Best model val loss: {val_loss_history[best_epoch-1]}")
+
+    # cleanup
+    for path in model_checkpoint_paths:
+        os.remove(path)
+
+    model.load_state_dict(torch.load(best_model_final_path))
+    return model
 
 
 def main() -> None:
@@ -121,11 +148,17 @@ def main() -> None:
     print("Loading datasets...")
     train_data = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
     dev_data = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
+    test_data = SBICDataset(config.SBIC_TEST_PATH, tokenizer)
     train_dataset = DataLoader(train_data, batch_size=config.BATCH_SIZE, shuffle=True)
     dev_dataset = DataLoader(dev_data, batch_size=config.BATCH_SIZE, shuffle=False)
+    test_dataset = DataLoader(test_data, batch_size=config.BATCH_SIZE, shuffle=False)
 
     print("Training model...")
-    train(train_dataset, dev_dataset, model)
+    trained_model = train(train_dataset, dev_dataset, model)
+
+    # check performance on the test set
+    loss = validate(test_dataset, trained_model, get_device())
+    print(f"Loss on test set: {loss}")
 
 
 if __name__ == "__main__":
