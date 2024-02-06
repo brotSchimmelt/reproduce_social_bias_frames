@@ -114,7 +114,7 @@ def train(
 
     #     # validation step
     #     validate(dev_data, model, device)
-    for i in tqdm.tqdm(range(epochs)):
+    for _ in tqdm(range(epochs)):
         for X, a in train_data:
             X = X.to(device)
             a = a.to(device)
