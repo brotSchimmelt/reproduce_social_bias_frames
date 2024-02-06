@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 from torch.utils.data import Dataset
 from transformers import GPT2Tokenizer
@@ -52,6 +54,8 @@ class SBICDataset(Dataset):
         )
         self.input_ids = self.encoded_data["input_ids"]
         self.attention_mask = self.encoded_data["attention_mask"]
+
+        logging.info(f"First input_ids: {self.input_ids[0]}")
 
     def __len__(self) -> int:
         return len(self.data)
