@@ -165,3 +165,5 @@ tmp_2/*
 results/*
 .vscode/*
 _*.py
+copy.sh
+copy_exclude.txt
