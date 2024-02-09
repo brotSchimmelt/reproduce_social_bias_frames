@@ -32,8 +32,7 @@ class SBICDataset(Dataset):
             statement = row["targetStereotype"]
 
             # create samples
-            target = config.FULL_SAMPLE_TEMPLATE.format(
-                post=post,
+            target = config.TARGET_TEMPLATE.format(
                 lewd=config.LEWD_TOKEN[lewd],
                 off=config.OFF_TOKEN[off],
                 intention=config.INT_TOKEN[intention],
@@ -42,7 +41,7 @@ class SBICDataset(Dataset):
                 statement=statement,
                 ing=config.ING_TOKEN[ing],
             ).strip()
-            generation_prompt = config.GENERATION_TEMPLATE.format(post=post).strip()
+            generation_prompt = config.INPUT_TEMPLATE.format(post=post).strip()
 
             self.generation_prompts.append(generation_prompt)
             self.targets.append(target)
