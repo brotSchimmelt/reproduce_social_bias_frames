@@ -41,15 +41,18 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
             "pad_token": "[PAD]",
             "bos_token": config.START_TOKEN,
             "eos_token": config.END_TOKEN,
-            "additional_special_tokens": [config.SEP_TOKEN],
+            # "additional_special_tokens": [config.SEP_TOKEN],
+            "additional_special_tokens": config.OTHER_TOKENS + [config.SEP_TOKEN],
         }
     )
-    tokenizer.add_tokens(config.OTHER_TOKENS)
+    # tokenizer.add_tokens(config.OTHER_TOKENS)
 
     return tokenizer
 
 
-def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> float:
+def validate(
+    dev_data: DataLoader, model: GPT2LMHeadModel, device: str, is_test_set: bool = False
+) -> float:
     """Validate the performance on the dev dataset."""
 
     model.eval()
@@ -69,10 +72,14 @@ def validate(dev_data: DataLoader, model: GPT2LMHeadModel, device: str) -> float
 
     # compute average validation loss
     avg_val_loss = total_loss / len(dev_data)
-    logging.info(f"Validation Loss: {avg_val_loss}")
-    print(f"Validation Loss: {avg_val_loss}")
+    if is_test_set:
+        logging.info(f"Test Loss: {avg_val_loss}")
+        print(f"Test Loss: {avg_val_loss}")
+    else:
+        logging.info(f"Validation Loss: {avg_val_loss}")
+        print(f"Validation Loss: {avg_val_loss}")
 
-    model.train()  # don't forget this all the time
+    model.train()
 
     return avg_val_loss
 
@@ -102,6 +109,7 @@ def train(
     # train loop
     for idx in range(epochs):
         print(f"Start Epoch {idx+1}:")
+        logging.info(f"Start Epoch {idx+1}:")
         total_loss = 0
         for batch in tqdm(train_data):
 
@@ -156,7 +164,7 @@ def main() -> None:
 
     # load model and tokenizer
     print("Loading model and tokenizer...")
-    model_path = config.GPT2_SMALL
+    model_path = config.MODEL_TYPE
     tokenizer = load_tokenizer(model_path)
     model = GPT2LMHeadModel.from_pretrained(model_path)
     model.resize_token_embeddings(len(tokenizer))  # since we added new tokens
@@ -174,11 +182,12 @@ def main() -> None:
     trained_model = train(train_dataset, dev_dataset, model)
 
     # check performance on the test set
-    loss = validate(test_dataset, trained_model, get_device())
-    logging.info(f"Loss on test set: {loss}")
+    _ = validate(test_dataset, trained_model, get_device(), is_test_set=True)
+    logging.info("Done.")
 
 
 if __name__ == "__main__":
     set_seed(config.SEED)
     main()
+    logging.info(f"Training took {get_run_time(start)} minutes")
     print(f"Elapsed time: {get_run_time(start)} min.")
