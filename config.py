@@ -13,11 +13,12 @@ GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
 SEED = 42
 
 # model settings
+MODEL_TYPE = GPT2_XL
 MAX_LENGTH = 1024
 WARMUP_STEPS = 500
-BATCH_SIZE = 4  # from paper
-LEARNING_RATE = 1e-5  # from paper
-EPOCHS = 5  # 1,2,5 from paper
+BATCH_SIZE = 4  # from paper: 4
+LEARNING_RATE = 1e-5  # from paper: 1e-5
+EPOCHS = 2  # from paper: 1,2,5
 
 # logging configuration
 IC_ENABLE = True
@@ -61,9 +62,5 @@ ING_TOKEN = {
 }
 
 # sample templates
-FULL_SAMPLE_TEMPLATE = (
-    f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} "
-    f"{{intention}} {{grp}} {SEP_TOKEN} "
-    f"{{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
-)
-GENERATION_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
+INPUT_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
+TARGET_TEMPLATE = f"{{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
