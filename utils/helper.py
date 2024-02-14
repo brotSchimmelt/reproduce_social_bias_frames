@@ -3,8 +3,10 @@ import logging
 import random
 import re
 from datetime import datetime
+from typing import List
 
 import numpy as np
+import pandas as pd
 import torch
 from icecream import ic
 
@@ -35,7 +37,9 @@ def get_device() -> str:
     return (
         "cuda"
         if torch.cuda.is_available()
-        else "mps" if torch.backends.mps.is_available() else "cpu"
+        else "mps"
+        if torch.backends.mps.is_available()
+        else "cpu"
     )
 
 
@@ -118,3 +122,17 @@ def replace_links(s: str) -> str:
         r"(http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+)|(pic\.twitter\.com/\S+)"
     )
     return link_pattern.sub("<link>", s).strip()
+
+
+def write_output_to_csv(true_labels: List[str], predictions: List[str]) -> None:
+    """
+    Writes the true labels and predictions to a CSV file in the tmp/ directory.
+    The file is named with the current timestamp to ensure uniqueness.
+
+    Args:
+    - true_labels (List[str]): A list of true labels.
+    - predictions (List[str]): A list of predicted labels.
+    """
+    df = pd.DataFrame({"true_labels": true_labels, "predictions": predictions})
+    now = datetime.now().strftime("%d-%m_%H-%M-%S")
+    df.to_csv(f"tmp/{now}.csv", index=False)
