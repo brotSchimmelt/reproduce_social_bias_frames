@@ -1,5 +1,3 @@
-import logging
-
 import pandas as pd
 from torch.utils.data import Dataset
 from transformers import GPT2Tokenizer
@@ -9,9 +7,7 @@ from utils.helper import clean_post
 
 
 class SBICDataset(Dataset):
-
     def __init__(self, path: str, tokenizer: GPT2Tokenizer) -> None:
-
         self.tokenizer = tokenizer
         self.path = path
         self.df = pd.read_csv(self.path)
@@ -20,7 +16,6 @@ class SBICDataset(Dataset):
 
         # iterate over the dataframe and prepare the data
         for _, row in self.df.iterrows():
-
             # preprocess input data
             post = clean_post(row["post"])
             lewd = 1 if row["sexYN"] == 1.0 else 0
