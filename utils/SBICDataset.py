@@ -11,8 +11,7 @@ class SBICDataset(Dataset):
         self.tokenizer = tokenizer
         self.path = path
         self.df = pd.read_csv(self.path)
-        self.generation_prompts = []
-        self.targets = []
+        self.generation_prompts, self.targets = [], []
 
         # iterate over the dataframe and prepare the data
         for _, row in self.df.iterrows():
@@ -27,6 +26,7 @@ class SBICDataset(Dataset):
             statement = row["targetStereotype"]
 
             # create samples
+            generation_prompt = config.GENERATION_TEMPLATE.format(post=post).strip()
             target = config.TARGET_TEMPLATE.format(
                 lewd=config.LEWD_TOKEN[lewd],
                 off=config.OFF_TOKEN[off],
@@ -36,7 +36,6 @@ class SBICDataset(Dataset):
                 statement=statement,
                 ing=config.ING_TOKEN[ing],
             ).strip()
-            generation_prompt = config.INPUT_TEMPLATE.format(post=post).strip()
 
             self.generation_prompts.append(generation_prompt)
             self.targets.append(target)

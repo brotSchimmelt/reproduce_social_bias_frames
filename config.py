@@ -18,7 +18,7 @@ MAX_LENGTH = 1024
 WARMUP_STEPS = 500
 BATCH_SIZE = 4  # from paper: 4
 LEARNING_RATE = 1e-5  # from paper: 1e-5
-EPOCHS = 2  # from paper: 1,2,5
+EPOCHS = 1  # from paper: 1,2,5
 
 # logging configuration
 IC_ENABLE = True
@@ -62,5 +62,5 @@ ING_TOKEN = {
 }
 
 # sample templates
-INPUT_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
+GENERATION_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
 TARGET_TEMPLATE = f"{{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
