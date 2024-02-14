@@ -124,7 +124,9 @@ def replace_links(s: str) -> str:
     return link_pattern.sub("<link>", s).strip()
 
 
-def write_output_to_csv(true_labels: List[str], predictions: List[str]) -> None:
+def write_output_to_csv(
+    true_labels: List[str], predictions: List[str], prefix: str = "val"
+) -> None:
     """
     Writes the true labels and predictions to a CSV file in the tmp/ directory.
     The file is named with the current timestamp to ensure uniqueness.
@@ -132,7 +134,8 @@ def write_output_to_csv(true_labels: List[str], predictions: List[str]) -> None:
     Args:
     - true_labels (List[str]): A list of true labels.
     - predictions (List[str]): A list of predicted labels.
+    - prefix (str, optional): A prefix to use in the filename. Defaults to "val".
     """
     df = pd.DataFrame({"true_labels": true_labels, "predictions": predictions})
     now = datetime.now().strftime("%d-%m_%H-%M-%S")
-    df.to_csv(f"tmp/{now}.csv", index=False)
+    df.to_csv(f"tmp/output/{prefix}_{now}.csv", index=False)
