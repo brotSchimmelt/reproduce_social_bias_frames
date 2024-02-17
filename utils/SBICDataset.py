@@ -62,7 +62,8 @@ class SBICDataset(Dataset):
         # remove filler tokens
         if not config.USE_FILL_TOKEN:
             self.generation_prompts = [
-                p.replace(config.FILL_TOKEN, "") for p in self.generation_prompts
+                p.replace(config.FILL_TOKEN, "").strip()
+                for p in self.generation_prompts
             ]
             self.targets = [t.replace(config.FILL_TOKEN, "") for t in self.targets]
 
@@ -85,12 +86,17 @@ class SBICDataset(Dataset):
         self.attention_mask = self.encoded_prompts["attention_mask"]
         self.labels = self.encoded_targets["input_ids"]
 
+        # log the lengths of the input_ids and labels
         logging.info(
             f"len(Input_ids): {len(self.input_ids)} | len(labels): {len(self.labels)}"
         )
-        logging.info(f"Input_id lengths: {set([len(i) for i in self.input_ids])}")
-        logging.info(f"Label lengths: {set([len(i) for i in self.labels])}")
-        logging.info(f"Use FILL token: {config.USE_FILL_TOKEN}")
+        logging.info(
+            f"Input_id lengths: {set([len(i) for i in self.input_ids])} | max_length: {self.max_length}"
+        )
+        logging.info(
+            f"Label lengths: {set([len(i) for i in self.labels])} | max_length: {self.max_length}"
+        )
+        logging.info(f"Use FILL token: {config.USE_FILL_TOKEN} | {config.FILL_TOKEN}")
 
     def __len__(self) -> int:
         return len(self.labels)
