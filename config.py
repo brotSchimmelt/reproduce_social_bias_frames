@@ -1,3 +1,9 @@
+# logging configuration
+LOGGING_LEVEL = "INFO"
+LOGGING_FORMAT = "%(asctime)s-%(levelname)s: %(message)s"
+LOGGING_DATEFMT = "%d-%m-%Y %H:%M:%S"
+LOGGING_FILE_DATEFMT = "%d_%m-%H_%M_%S"
+
 # data paths
 SBIC_PATH = "data/SBIC/"
 SBIC_TEST_PATH = f"{SBIC_PATH}SBIC.v2.tst.csv"
@@ -8,29 +14,28 @@ LOG_DIR = "logs/"
 # model paths
 GPT2_SMALL = "/bigwork/nhwpknet/models/gpt2-small"
 GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
+MODEL_TYPE = GPT2_SMALL  # version of GPT2 not mentioned in paper
 
-# random seed
-SEED = 42
+# random seeds
+DEFAULT_SEED = 42
+EXPERIMENT_SEEDS = [42, 1337, 31415, 271828, 1701]
 
 # model settings
-MODEL_TYPE = GPT2_XL
-MAX_LENGTH = 1024
-WARMUP_STEPS = 500
-BATCH_SIZE = 4  # from paper: 4
-LEARNING_RATE = 1e-5  # from paper: 1e-5
-EPOCHS = 1  # from paper: 1,2,5
-
-# logging configuration
-IC_ENABLE = True
-LOGGING_LEVEL = "INFO"
-LOGGING_FORMAT = "%(asctime)s-%(levelname)s: %(message)s"
-LOGGING_DATEFMT = "%d-%m-%Y %H:%M:%S"
-LOGGING_FILE_DATEFMT = "%d_%m-%H_%M_%S"
+MAX_LENGTH = 128  # not mentioned in paper
+LOGGING_STEPS = 5_000
+DEFAULT_WARMUP_STEPS = 500  # paper did mention warum up, but not the number of steps
+DEFAULT_BATCH_SIZE = 4  # from paper: 4
+DEFAULT_LEARNING_RATE = 1e-5  # from paper: 1e-5
+DEFAULT_NUM_EPOCHS = 5  # from paper: 1,2,5
+DEFAULT_NUM_RETURN_SEQ = 10  # from paper for sampling based inference: 10
 
 # special tokens
+USE_FILL_TOKEN = True
 START_TOKEN = "[STR]"
 END_TOKEN = "[END]"
 SEP_TOKEN = "[SEP]"
+PAD_TOKEN = "[PAD]"
+FILL_TOKEN = "[FILL]"
 OTHER_TOKENS = [
     "[offN]",
     "[offY]",
@@ -42,6 +47,7 @@ OTHER_TOKENS = [
     "[grpY]",
     "[ingN]",
     "[ingY]",
+    "[FILL]",
 ]
 OFF_TOKEN = {0: "[offN]", 1: "[offY]"}
 LEWD_TOKEN = {
@@ -61,6 +67,12 @@ ING_TOKEN = {
     1: "[ingY]",
 }
 
-# sample templates
+# template for generation
 GENERATION_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
-TARGET_TEMPLATE = f"{{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
+
+# templates for targets
+FULL_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
+OFFN_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
+OFFY_GRPN_TARGET_TEMPLATE = (
+    f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
+)
