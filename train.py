@@ -59,13 +59,13 @@ def train(model: GPT2LMHeadModel, tokenizer: GPT2Tokenizer) -> GPT2LMHeadModel:
 
     training_args = TrainingArguments(
         output_dir="./tmp/results",
-        num_train_epochs=config.EPOCHS,  # 1,2,5
-        per_device_train_batch_size=config.BATCH_SIZE,  # 4
-        per_device_eval_batch_size=config.BATCH_SIZE,  # 4
-        warmup_steps=config.WARMUP_STEPS,  # number of warmup steps is not mentioned in the paper
-        learning_rate=config.LEARNING_RATE,  # 1e-5
+        num_train_epochs=config.DEFAULT_NUM_EPOCHS,  # 1,2,5
+        per_device_train_batch_size=config.DEFAULT_BATCH_SIZE,  # 4
+        per_device_eval_batch_size=config.DEFAULT_BATCH_SIZE,  # 4
+        warmup_steps=config.DEFAULT_WARMUP_STEPS,  # number of warmup steps is not mentioned in the paper
+        learning_rate=config.DEFAULT_LEARNING_RATE,  # 1e-5
         logging_dir="./logs",
-        logging_steps=config.LOGGING_STEPS,
+        logging_steps=config.LOGGING_STEPS,  # 5_000
         evaluation_strategy="epoch",
         save_strategy="epoch",
         load_best_model_at_end=True,
@@ -89,24 +89,25 @@ def train(model: GPT2LMHeadModel, tokenizer: GPT2Tokenizer) -> GPT2LMHeadModel:
     return model
 
 
-def main() -> None:
+def main(model_path: str) -> None:
     print("Loading model and tokenizer...")
-    model_path = config.MODEL_TYPE
     tokenizer = load_tokenizer(model_path)
     model = GPT2LMHeadModel.from_pretrained(model_path)
     model.resize_token_embeddings(len(tokenizer))  # since we added new tokens
+    logging.info(f"Model and tokenizer loaded from {model_path}")
 
     # train the model
     trained_model = train(model, tokenizer)
 
     # save the model and the tokenizer
-    model_path = f"./tmp/models/best_model_{timestamp}"
-    trained_model.save_pretrained(model_path)
-    tokenizer.save_pretrained(model_path)
-    logging.info(f"Model and tokenizer saved to {model_path}")
+    now = datetime.now().strftime(config.LOGGING_FILE_DATEFMT)
+    model_save_path = f"./tmp/models/best_model_{now}"
+    trained_model.save_pretrained(model_save_path)
+    tokenizer.save_pretrained(model_save_path)
+    logging.info(f"Model and tokenizer saved to {model_save_path}")
 
 
 if __name__ == "__main__":
-    set_seed(config.SEED)
-    main()
+    set_seed(config.DEFAULT_SEED)
+    main(config.GPT2_XL)
     print(f"Elapsed time: {get_run_time(start)} min.")
