@@ -1,30 +1,14 @@
 import html
 import logging
-import random
 import re
 from datetime import datetime
 from typing import List
 
-import numpy as np
 import pandas as pd
 import torch
 from icecream import ic
 
-
-def set_seed(seed_value: int = 42) -> None:
-    """
-    Sets the seed for random number generators in random, numpy, and torch for reproducibility.
-
-    Parameters:
-    - seed_value (int, optional): The seed value to use for all random number generators. Defaults to 42.
-    """
-    random.seed(seed_value)
-    np.random.seed(seed_value)
-    torch.manual_seed(seed_value)
-    torch.cuda.manual_seed(seed_value)
-    torch.cuda.manual_seed_all(seed_value)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+import config
 
 
 def get_device() -> str:
@@ -136,6 +120,8 @@ def write_output_to_csv(
     - predictions (List[str]): A list of predicted labels.
     - prefix (str, optional): A prefix to use in the filename. Defaults to "val".
     """
+    true_labels = [label.replace(config.PAD_TOKEN, "") for label in true_labels]
+    predictions = [pred.replace(config.PAD_TOKEN, "") for pred in predictions]
     df = pd.DataFrame({"true_labels": true_labels, "predictions": predictions})
     now = datetime.now().strftime("%d-%m_%H-%M-%S")
     df.to_csv(f"tmp/output/{prefix}_{now}.csv", index=False)
