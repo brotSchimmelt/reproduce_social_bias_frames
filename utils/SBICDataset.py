@@ -9,9 +9,12 @@ from utils.helper import clean_post
 
 
 class SBICDataset(Dataset):
-    def __init__(self, path: str, tokenizer: GPT2Tokenizer) -> None:
+    def __init__(
+        self, path: str, tokenizer: GPT2Tokenizer, fill_token_flag: bool
+    ) -> None:
         self.tokenizer = tokenizer
         self.path = path
+        self.fill_token_flag = fill_token_flag
         self.df = pd.read_csv(self.path)
         self.generation_prompts, self.targets = [], []
         self.pad_value = tokenizer.pad_token_id
@@ -60,7 +63,7 @@ class SBICDataset(Dataset):
             self.targets.append(target)
 
         # remove filler tokens
-        if not config.USE_FILL_TOKEN:
+        if not self.fill_token_flag:
             self.generation_prompts = [
                 p.replace(config.FILL_TOKEN, "").strip()
                 for p in self.generation_prompts
@@ -96,7 +99,9 @@ class SBICDataset(Dataset):
         logging.info(
             f"Label lengths: {set([len(i) for i in self.labels])} | max_length: {self.max_length}"
         )
-        logging.info(f"Use FILL token: {config.USE_FILL_TOKEN} | {config.FILL_TOKEN}")
+        logging.info(f"Use FILL token: {self.fill_token_flag} | {config.FILL_TOKEN}")
+        logging.info(f"First Generation Prompt: {self.generation_prompts[0]}")
+        logging.info(f"First Target: {self.targets[0]}")
 
     def __len__(self) -> int:
         return len(self.labels)
