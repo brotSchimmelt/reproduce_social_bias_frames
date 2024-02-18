@@ -7,8 +7,25 @@ from typing import List
 import pandas as pd
 import torch
 from icecream import ic
+from transformers import TrainerCallback
 
 import config
+
+
+class EvalLoggingCallback(TrainerCallback):
+    """Custom callback for logging evaluation results separately."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__()
+
+        for k, v in kwargs.items():
+            if k == "output_dir":
+                setattr(self, k, v)
+
+    def on_evaluate(self, args, state, control, **kwargs):
+        # Log validation loss separately
+        with open(self.output_dir, "a") as log_file:
+            log_file.write(f"{state.global_step},{kwargs['metrics']['eval_loss']}\n")
 
 
 def get_device() -> str:
