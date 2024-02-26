@@ -45,7 +45,7 @@ END_TOKEN = "<|endoftext|>"
 SEP_TOKEN = "<|sep|>"
 PAD_TOKEN = "<|pad|>"
 UNK_TOKEN = "<|unk|>"
-FILL_TOKEN = "[FILL]"
+HELP_SEP = "[SEP]"
 OTHER_TOKENS = [
     "[offN]",
     "[offY]",
@@ -57,7 +57,7 @@ OTHER_TOKENS = [
     "[grpY]",
     "[ingN]",
     "[ingY]",
-    "[FILL]",
+    "[SEP]",
 ]
 OFF_TOKEN = {0: "[offN]", 1: "[offY]"}
 LEWD_TOKEN = {
@@ -88,6 +88,6 @@ GENERATION_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
 # )
 
 # new templates
-TRAIN_TEMPLATE_FULL = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
+TRAIN_TEMPLATE_FULL = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {HELP_SEP} {{group}} {SEP_TOKEN} {HELP_SEP} {{statement}} {SEP_TOKEN} {HELP_SEP} {{ing}} {END_TOKEN}"
 TRAIN_TEMPLATE_OFFN = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
 TRAIN_TEMPLATE_GRPN = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
