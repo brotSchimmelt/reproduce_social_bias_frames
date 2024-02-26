@@ -135,7 +135,7 @@ def train(
         logging_steps=config.LOGGING_STEPS,  # 500
         evaluation_strategy="epoch",
         save_strategy="epoch",
-        load_best_model_at_end=True,
+        # load_best_model_at_end=True,
     )
 
     trainer = Trainer(
