@@ -15,7 +15,7 @@ CHECKPOINT_DIR = "tmp/checkpoints/"
 # model paths
 GPT2_SMALL = "/bigwork/nhwpknet/models/gpt2-small"
 GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
-DEFAULT_MODEL = GPT2_SMALL  # version of GPT2 not mentioned in paper
+DEFAULT_MODEL = GPT2_XL  # version of GPT2 not mentioned in paper
 
 # random seeds
 DEFAULT_SEED = 42
@@ -31,10 +31,10 @@ DEFAULT_NUM_EPOCHS = 5  # from paper: 1,2,5
 DEFAULT_NUM_RETURN_SEQ = 10  # from paper for sampling based inference: 10
 
 # special tokens
-START_TOKEN = "[STR]"
-END_TOKEN = "[END]"
-SEP_TOKEN = "[SEP]"
-PAD_TOKEN = "[PAD]"
+START_TOKEN = "<|startoftext|>"
+END_TOKEN = "<|endoftext|>"
+SEP_TOKEN = "<|sep|>"
+PAD_TOKEN = "<|pad|>"
 FILL_TOKEN = "[FILL]"
 OTHER_TOKENS = [
     "[offN]",
@@ -76,3 +76,8 @@ OFFN_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
 OFFY_GRPN_TARGET_TEMPLATE = (
     f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
 )
+
+# new templates
+TRAIN_TEMPLATE_FULL = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
+TRAIN_TEMPLATE_OFFN = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
+TRAIN_TEMPLATE_GRPN = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
