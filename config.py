@@ -15,7 +15,7 @@ CHECKPOINT_DIR = "tmp/checkpoints/"
 # model paths
 GPT2_SMALL = "/bigwork/nhwpknet/models/gpt2-small"
 GPT2_XL = "/bigwork/nhwpknet/models/gpt2-xl"
-DEFAULT_MODEL = GPT2_XL  # version of GPT2 not mentioned in paper
+DEFAULT_MODEL = GPT2_SMALL  # version of GPT2 not mentioned in paper
 
 # random seeds
 DEFAULT_SEED = 42
