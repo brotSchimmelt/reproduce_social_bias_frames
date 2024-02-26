@@ -2,8 +2,8 @@
 
 start_time=$(date +%s)
 
-EPOCHS=(1 2 5)
-SEEDS=(42 1337 31415)
+EPOCHS=(2 5)
+SEEDS=(42)
 
 # loop over epochs
 for epoch in "${EPOCHS[@]}"; do
