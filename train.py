@@ -72,11 +72,6 @@ def parse_arguments() -> argparse.Namespace:
         default=config.DEFAULT_SEED,
         help="Random seed for initialization",
     )
-    parser.add_argument(
-        "--use_fill_token",
-        action="store_true",  # default=False
-        help="Whether to use a fill token or not",
-    )
     return parser.parse_args()
 
 
@@ -84,25 +79,34 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
     """Load tokenizer and add special tokens."""
     tokenizer = GPT2Tokenizer.from_pretrained(model_path)
 
-    # add new special tokens
+    # add special token
     tokenizer.add_special_tokens(
         {
-            "pad_token": config.PAD_TOKEN,
             "bos_token": config.START_TOKEN,
             "eos_token": config.END_TOKEN,
-            "additional_special_tokens": config.OTHER_TOKENS + [config.SEP_TOKEN],
+            "pad_token": config.PAD_TOKEN,
+            "sep_token": config.SEP_TOKEN,
+            "unk_token": config.UNK_TOKEN,
         }
     )
+
+    # add other tokens as new normal tokens
+    # NOTE alternative:
+    # add other tokens as new special tokens "additional_special_tokens"
+    tokenizer.add_tokens(config.OTHER_TOKENS)
+
+    logging.info(f"Start Token: {tokenizer.bos_token_id} | {tokenizer.bos_token}")
+    logging.info(f"End Token: {tokenizer.eos_token_id} | {tokenizer.eos_token}")
+    logging.info(f"Pad Token: {tokenizer.pad_token_id} | {tokenizer.pad_token}")
+    logging.info(f"Sep Token: {tokenizer.sep_token_id} | {tokenizer.sep_token}")
     return tokenizer
 
 
-def load_data(
-    tokenizer: GPT2Tokenizer, fill_token_flag: bool
-) -> Tuple[SBICDataset, SBICDataset, SBICDataset]:
+def load_data(tokenizer: GPT2Tokenizer) -> Tuple[SBICDataset, SBICDataset, SBICDataset]:
     """Load the SBIC dataset."""
-    train = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer, fill_token_flag)
-    dev = SBICDataset(config.SBIC_DEV_PATH, tokenizer, fill_token_flag)
-    test = SBICDataset(config.SBIC_TEST_PATH, tokenizer, fill_token_flag)
+    train = SBICDataset(config.SBIC_TRAIN_PATH, tokenizer)
+    dev = SBICDataset(config.SBIC_DEV_PATH, tokenizer)
+    test = SBICDataset(config.SBIC_TEST_PATH, tokenizer)
     logging.info(f"Split: train={len(train)}, dev={len(dev)}, test={len(test)}")
     return train, dev, test
 
@@ -114,12 +118,9 @@ def train(
     args: argparse.Namespace,
 ) -> GPT2LMHeadModel:
     print("Loading datasets...")
-    train_data, dev_data, test_data = load_data(tokenizer, args.use_fill_token)
+    train_data, dev_data, test_data = load_data(tokenizer)
 
-    output_dir = (
-        config.CHECKPOINT_DIR
-        + f"{model_name}_{'fillY' if args.use_fill_token else 'fillN'}_{args.random_seed}/"
-    )
+    output_dir = config.CHECKPOINT_DIR + f"{model_name}_{args.random_seed}/"
 
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -171,7 +172,7 @@ def main() -> None:
 
     # save the model and the tokenizer
     now = datetime.now().strftime(config.LOGGING_FILE_DATEFMT)
-    model_save_path = f"./tmp/models/best_model_fillY_{args.random_seed}_{now}"
+    model_save_path = f"./tmp/models/{model_name}_{args.random_seed}_{now}"
     trained_model.save_pretrained(model_save_path)
     tokenizer.save_pretrained(model_save_path)
     logging.info(f"Model and tokenizer saved to {model_save_path}")
