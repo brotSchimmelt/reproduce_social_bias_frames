@@ -93,7 +93,9 @@ def load_tokenizer(model_path: str) -> GPT2Tokenizer:
     # add other tokens as new normal tokens
     # NOTE alternative:
     # add other tokens as new special tokens "additional_special_tokens"
-    tokenizer.add_tokens(config.OTHER_TOKENS)
+    tokenizer.add_tokens(
+        config.OTHER_TOKENS + ["<link>"]
+    )  # <link> token is added in preprocessing step for hyperlinks
 
     logging.info(f"Start Token: {tokenizer.bos_token_id} | {tokenizer.bos_token}")
     logging.info(f"End Token: {tokenizer.eos_token_id} | {tokenizer.eos_token}")
