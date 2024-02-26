@@ -30,6 +30,11 @@ DEFAULT_LEARNING_RATE = 1e-5  # from paper: 1e-5
 DEFAULT_NUM_EPOCHS = 5  # from paper: 1,2,5
 DEFAULT_NUM_RETURN_SEQ = 10  # from paper for sampling based inference: 10
 
+# inference settings
+INFERENCE_BATCH_SIZE = 2  # TODO test for max value
+PADDING_SIDE = "left"
+NUM_RETURN_SEQ = 10
+
 # special tokens
 START_TOKEN = "<|startoftext|>"
 END_TOKEN = "<|endoftext|>"
