@@ -120,7 +120,9 @@ def train(
     print("Loading datasets...")
     train_data, dev_data, test_data = load_data(tokenizer)
 
-    output_dir = config.CHECKPOINT_DIR + f"{model_name}_{args.random_seed}/"
+    output_dir = (
+        config.CHECKPOINT_DIR + f"{model_name}_{args.random_seed}_{args.epochs}/"
+    )
 
     training_args = TrainingArguments(
         output_dir=output_dir,
@@ -171,8 +173,7 @@ def main() -> None:
     trained_model = train(model, tokenizer, model_name=model_name, args=args)
 
     # save the model and the tokenizer
-    now = datetime.now().strftime(config.LOGGING_FILE_DATEFMT)
-    model_save_path = f"./tmp/models/{model_name}_{args.random_seed}_{now}"
+    model_save_path = f"./tmp/models/{model_name}_{args.random_seed}_{args.epochs}"
     trained_model.save_pretrained(model_save_path)
     tokenizer.save_pretrained(model_save_path)
     logging.info(f"Model and tokenizer saved to {model_save_path}")
