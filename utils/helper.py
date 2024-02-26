@@ -1,3 +1,4 @@
+import hashlib
 import html
 import logging
 import re
@@ -142,3 +143,17 @@ def write_output_to_csv(
     df = pd.DataFrame({"true_labels": true_labels, "predictions": predictions})
     now = datetime.now().strftime("%d-%m_%H-%M-%S")
     df.to_csv(f"tmp/output/{prefix}_{now}.csv", index=False)
+
+
+def create_md5_hash(input_string: str) -> str:
+    """
+    Generates an MD5 hash for the given input string.
+
+    Args:
+    - input_string (str): The string to be hashed.
+
+    Returns:
+    - str: The hexadecimal MD5 hash of the input string.
+    """
+    hash_object = hashlib.md5(input_string.encode())
+    return hash_object.hexdigest()
