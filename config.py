@@ -35,6 +35,7 @@ START_TOKEN = "<|startoftext|>"
 END_TOKEN = "<|endoftext|>"
 SEP_TOKEN = "<|sep|>"
 PAD_TOKEN = "<|pad|>"
+UNK_TOKEN = "<|unk|>"
 FILL_TOKEN = "[FILL]"
 OTHER_TOKENS = [
     "[offN]",
