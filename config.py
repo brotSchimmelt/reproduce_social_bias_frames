@@ -25,7 +25,7 @@ DEFAULT_SEED = 42
 EXPERIMENT_SEEDS = [42, 1337, 31415, 271828, 1701]
 
 # model settings
-MAX_LENGTH = 128  # not mentioned in paper TODO change to 256
+MAX_LENGTH = 256  # not mentioned in paper
 LOGGING_STEPS = 500
 DEFAULT_WARMUP_STEPS = 500  # paper did mention warum up, but not the number of steps
 DEFAULT_BATCH_SIZE = 4  # from paper: 4
@@ -34,8 +34,8 @@ DEFAULT_NUM_EPOCHS = 5  # from paper: 1,2,5
 DEFAULT_NUM_RETURN_SEQ = 10  # from paper for sampling based inference: 10
 
 # inference settings
-INFERENCE_BATCH_SIZE_GREEDY = 1024  # TODO test for max value
-INFERENCE_BATCH_SIZE_SAMPLING = 64  # TODO test for max value
+INFERENCE_BATCH_SIZE_GREEDY = 1024
+INFERENCE_BATCH_SIZE_SAMPLING = 128
 PADDING_SIDE = "left"
 NUM_RETURN_SEQ = 10
 
