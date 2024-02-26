@@ -29,6 +29,21 @@ class EvalLoggingCallback(TrainerCallback):
             log_file.write(f"{state.global_step},{kwargs['metrics']['eval_loss']}\n")
 
 
+class SaveLossCallback(TrainerCallback):
+    """A callback that saves training loss to a file at specified intervals."""
+
+    def __init__(self, save_path: str, logging_steps: int):
+        self.save_path = save_path
+        self.logging_steps = logging_steps
+
+    def on_log(self, args, state, control, logs=None, **kwargs):
+        if state.global_step % self.logging_steps == 0:
+            # Assuming 'loss' is in logs, adjust if necessary
+            if "loss" in logs:
+                with open(self.save_path, "a") as f:
+                    f.write(f"{state.global_step},{logs['loss']}\n")
+
+
 def get_device() -> str:
     """
     Determines the most suitable device for PyTorch operations.

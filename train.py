@@ -13,7 +13,7 @@ from transformers import (
 )
 
 import config
-from utils.helper import EvalLoggingCallback, get_run_time
+from utils.helper import EvalLoggingCallback, SaveLossCallback, get_run_time
 from utils.SBICDataset import SBICDataset
 
 #### LOGGING ####
@@ -145,7 +145,13 @@ def train(
         args=training_args,
         train_dataset=train_data,
         eval_dataset=dev_data,
-        callbacks=[EvalLoggingCallback(output_dir=output_dir + "validation.log")],
+        callbacks=[
+            EvalLoggingCallback(output_dir=output_dir + "validation_loss.log"),
+            SaveLossCallback(
+                save_path=output_dir + "train_loss.csv",
+                logging_steps=config.LOGGING_STEPS,
+            ),
+        ],
     )
 
     print("Training model...")
@@ -170,6 +176,7 @@ def main() -> None:
     model = GPT2LMHeadModel.from_pretrained(args.model_path)
     model.resize_token_embeddings(len(tokenizer))  # since we added new tokens
     logging.info(f"Model and tokenizer loaded from {args.model_path}")
+    print("Using model:", model_name)
 
     # train the model
     trained_model = train(model, tokenizer, model_name=model_name, args=args)
