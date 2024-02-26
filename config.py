@@ -5,10 +5,13 @@ LOGGING_DATEFMT = "%d-%m-%Y %H:%M:%S"
 LOGGING_FILE_DATEFMT = "%d_%m-%H_%M_%S"
 
 # paths
-SBIC_PATH = "data/SBIC/"
+DATA_PATH = "data/"
+SBIC_PATH = f"{DATA_PATH}SBIC/"
 SBIC_TEST_PATH = f"{SBIC_PATH}SBIC.v2.tst.csv"
 SBIC_TRAIN_PATH = f"{SBIC_PATH}SBIC.v2.trn.csv"
 SBIC_DEV_PATH = f"{SBIC_PATH}SBIC.v2.dev.csv"
+MODEL_PATH = "tmp/models/"
+OUTPUT_PATH = "tmp/output/"
 LOG_DIR = "logs/"
 CHECKPOINT_DIR = "tmp/checkpoints/"
 
@@ -22,7 +25,7 @@ DEFAULT_SEED = 42
 EXPERIMENT_SEEDS = [42, 1337, 31415, 271828, 1701]
 
 # model settings
-MAX_LENGTH = 128  # not mentioned in paper
+MAX_LENGTH = 128  # not mentioned in paper TODO change to 256
 LOGGING_STEPS = 500
 DEFAULT_WARMUP_STEPS = 500  # paper did mention warum up, but not the number of steps
 DEFAULT_BATCH_SIZE = 4  # from paper: 4
@@ -31,7 +34,8 @@ DEFAULT_NUM_EPOCHS = 5  # from paper: 1,2,5
 DEFAULT_NUM_RETURN_SEQ = 10  # from paper for sampling based inference: 10
 
 # inference settings
-INFERENCE_BATCH_SIZE = 2  # TODO test for max value
+INFERENCE_BATCH_SIZE_GREEDY = 1024  # TODO test for max value
+INFERENCE_BATCH_SIZE_SAMPLING = 64  # TODO test for max value
 PADDING_SIDE = "left"
 NUM_RETURN_SEQ = 10
 
@@ -77,11 +81,11 @@ ING_TOKEN = {
 GENERATION_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
 
 # templates for targets
-FULL_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
-OFFN_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
-OFFY_GRPN_TARGET_TEMPLATE = (
-    f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
-)
+# FULL_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
+# OFFN_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
+# OFFY_GRPN_TARGET_TEMPLATE = (
+#     f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
+# )
 
 # new templates
 TRAIN_TEMPLATE_FULL = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
