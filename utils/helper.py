@@ -172,3 +172,19 @@ def create_md5_hash(input_string: str) -> str:
     """
     hash_object = hashlib.md5(input_string.encode())
     return hash_object.hexdigest()
+
+
+def remove_substrings(original_string: str, substrings: str = config.HELP_SEP) -> str:
+    """
+    Removes all occurrences of each substring in 'substrings' from 'original_string'.
+
+    Parameters:
+    - original_string (str): The string from which substrings will be removed.
+    - substrings (List[str]): A list of substrings to remove from the original string.
+
+    Returns:
+    - str: The modified string with all specified substrings removed.
+    """
+    for substring in substrings:
+        original_string = original_string.replace(substring, "")
+    return original_string.strip()
