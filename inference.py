@@ -6,6 +6,7 @@ from typing import List, Tuple
 
 import pandas as pd
 import torch
+from tqdm import tqdm
 from transformers import GPT2LMHeadModel, GPT2Tokenizer, pipeline, set_seed
 
 import config
@@ -89,7 +90,7 @@ def decode_sampling(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
-        device=0,
+        device=0,  # device_map
         batch_size=batch_size,
     )
 
@@ -121,11 +122,14 @@ def choose_best_sampling_output(
 ) -> Tuple[List[str], List[int], List[float]]:
     """Choose the best sampling output based on the highest likelihood."""
 
+    device = get_device()
+
     best_output, best_idxs, best_scores = [], [], []
-    for output_list in sampling_outputs:
+    # for output_list in sampling_outputs:
+    for output_list in tqdm(sampling_outputs, desc="Choosing Sampling Outputs"):
         likelihoods = []
         for candidate in output_list:
-            tokens = tokenizer.encode(candidate, return_tensors="pt")
+            tokens = tokenizer.encode(candidate, return_tensors="pt").to(device)
 
             with torch.no_grad():
                 outputs = model(tokens, labels=tokens)
@@ -133,7 +137,8 @@ def choose_best_sampling_output(
                 # since we're using the same tokens as both input and labels, this gives us the
                 # negative log likelihood of the entire sequence
                 negative_log_likelihood = outputs.loss
-                likelihoods.append(-negative_log_likelihood)
+                # likelihoods.append(-negative_log_likelihood)
+                likelihoods.append(-negative_log_likelihood.item())
 
         # find the index of the highest likelihood
         best_idx = likelihoods.index(max(likelihoods))
@@ -167,19 +172,21 @@ def main() -> None:
     logging.info(f"First test prompt: {test_prompts[0]}")
 
     # greedy decoding
+    print("Starting greedy decoding...")
     dev_greedy_output = decode_greedy(dev_prompts, model, tokenizer)
     test_greedy_output = decode_greedy(test_prompts, model, tokenizer)
     logging.info(f"Greedy output for dev: {dev_greedy_output[0]}")
     logging.info(f"Greedy output for test: {test_greedy_output[0]}")
 
     # sampling decoding
+    print("Starting sampling decoding...")
     dev_sampling_output = decode_sampling(dev_prompts, model, tokenizer)
     test_sampling_output = decode_sampling(test_prompts, model, tokenizer)
     logging.info(f"Sampling output for dev: {dev_sampling_output[0][0]}")
     logging.info(f"Sampling output for test: {test_sampling_output[0][0]}")
 
     # choose the best sampling output
-    logging.info("Choosing the best sampling output based on the highest likelihood.")
+    print("Choosing the best sampling output based on the highest likelihood...")
     test_best_sampling_output = choose_best_sampling_output(
         test_sampling_output, model, default_tok
     )

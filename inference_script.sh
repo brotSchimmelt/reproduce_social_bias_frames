@@ -2,11 +2,11 @@
 
 start_time=$(date +%s)
 
-arguments=("gpt2-small_42_1" "model2")
+arguments=("gpt2-xl-1701-1" "gpt2-xl-1701-2" "gpt2-xl-1701-5")
 
 for arg in "${arguments[@]}"; do
     echo "Running inference.py with model: $arg"
-    python inference.py "$arg"
+    python inference.py --model_name "$arg" --max_length 128
 done
 
 echo "All inference runs completed."
