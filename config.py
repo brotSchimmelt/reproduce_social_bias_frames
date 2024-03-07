@@ -24,7 +24,7 @@ DEFAULT_MODEL = GPT2_XL  # version of GPT2 not mentioned in paper
 
 # random seeds
 DEFAULT_SEED = 42
-EXPERIMENT_SEEDS = [42]  # 1337, 31415, 271828, 1701
+EXPERIMENT_SEEDS = [42, 1337, 31415, 271828, 1701]
 
 # model settings
 MAX_LENGTH = 128  # not mentioned in paper
@@ -35,8 +35,8 @@ DEFAULT_LEARNING_RATE = 1e-5  # from paper: 1e-5
 DEFAULT_NUM_EPOCHS = 5  # from paper: 1,2,5
 
 # inference settings
-INFERENCE_BATCH_SIZE_GREEDY = 512  # max for 256 token model
-INFERENCE_BATCH_SIZE_SAMPLING = 64  # max for 256 token model
+INFERENCE_BATCH_SIZE_GREEDY = 256  # max for 256 token model
+INFERENCE_BATCH_SIZE_SAMPLING = 32  # max for 256 token model
 PADDING_SIDE = "left"
 NUM_RETURN_SEQ = 10  # from paper for sampling based inference: 10
 
@@ -81,14 +81,7 @@ ING_TOKEN = {
 # template for generation
 GENERATION_TEMPLATE = f"{START_TOKEN} {{post}} {SEP_TOKEN}"
 
-# templates for targets
-# FULL_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {{group}} {SEP_TOKEN} {{statement}} {SEP_TOKEN} {{ing}} {END_TOKEN}"
-# OFFN_TARGET_TEMPLATE = f"{FILL_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
-# OFFY_GRPN_TARGET_TEMPLATE = (
-#     f"{FILL_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
-# )
-
-# new templates
+# templates for training
 TRAIN_TEMPLATE_FULL = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {SEP_TOKEN} {HELP_SEP} {{group}} {SEP_TOKEN} {HELP_SEP} {{statement}} {SEP_TOKEN} {HELP_SEP} {{ing}} {END_TOKEN}"
 TRAIN_TEMPLATE_OFFN = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {END_TOKEN}"
 TRAIN_TEMPLATE_GRPN = f"{START_TOKEN} {{post}} {SEP_TOKEN} {{lewd}} {{off}} {{intention}} {{grp}} {END_TOKEN}"
