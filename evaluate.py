@@ -60,7 +60,7 @@ def evaluate_categorical_variables(
 def evaluate_generated_text(
     generated_text: str, reference_texts: List[str]
 ) -> Dict[str, float]:
-    nlp = spacy.load("en_core_web_md")
+    # nlp = spacy.load("en_core_web_md")
 
     # calculate BLEU-2
     reference_tokens = [ref.split() for ref in reference_texts]
@@ -74,10 +74,11 @@ def evaluate_generated_text(
     ]
     rouge_l_f1 = np.mean([score["rouge-l"]["f"] for score in scores])
 
-    # calculate WMD
-    generated_doc = nlp(generated_text)
-    reference_docs = [nlp(ref) for ref in reference_texts]
-    wmd_scores = [generated_doc.similarity(ref_doc) for ref_doc in reference_docs]
-    wmd_score = np.mean(wmd_scores)
+    # # calculate WMD
+    # generated_doc = nlp(generated_text)
+    # reference_docs = [nlp(ref) for ref in reference_texts]
+    # wmd_scores = [generated_doc.similarity(ref_doc) for ref_doc in reference_docs]
+    # wmd_score = np.mean(wmd_scores)
 
-    return {"bleu": bleu_2_score, "rouge": rouge_l_f1, "wmd": wmd_score}
+    # return {"bleu": bleu_2_score, "rouge": rouge_l_f1, "wmd": wmd_score}
+    return {"bleu": bleu_2_score, "rouge": rouge_l_f1}
