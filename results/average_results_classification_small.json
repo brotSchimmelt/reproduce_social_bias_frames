@@ -1,0 +1,27 @@
+{
+    "lewd": {
+        "f1_score": 57.3,
+        "precision": 69.4,
+        "recall": 49.4
+    },
+    "off": {
+        "f1_score": 70.6,
+        "precision": 75.4,
+        "recall": 66.6
+    },
+    "intention": {
+        "f1_score": 64.7,
+        "precision": 60.7,
+        "recall": 69.5
+    },
+    "grp": {
+        "f1_score": 69.3,
+        "precision": 70.1,
+        "recall": 68.7
+    },
+    "ing": {
+        "f1_score": 4.2,
+        "precision": 7.1,
+        "recall": 3.1
+    }
+}

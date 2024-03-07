@@ -1,0 +1,10 @@
+{
+    "group_multiple_result_greedy_test": {
+        "bleu": 58.4,
+        "rouge": 69.1
+    },
+    "statement_multiple_result_greedy_test": {
+        "bleu": 40.6,
+        "rouge": 28.8
+    }
+}
